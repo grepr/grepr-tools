@@ -18,3 +18,8 @@ export DD_API_KEY=<your API key>
 export DD_APP_KEY=<your App key>
 python3 setup_grepr_poc_keys.py setup --site <site> <query> <service_account_email>
 ```
+
+You can verify all the changes it made by going to the following URLs:
+1. https://app.datadoghq.com/logs/pipelines/data-access to view the restricted filter and the role assigned to it
+2. https://app.datadoghq.com/organization-settings/service-accounts to view the new service account and the role it has (which should match the role from point 1)
+3. If you click on the service role, you should see the new app key and you should see that the service account has limited permissions (as per the newly created role)
