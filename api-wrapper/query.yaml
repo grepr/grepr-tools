@@ -1,0 +1,21 @@
+
+# The address for your Grepr tenant
+endpoint: "https://greprprod.app.grepr.ai/"
+# The name of the dataset you want to run the query against
+# https://docs.grepr.ai/data-lake/
+dataset: "datadog_eu"
+query:
+    # which syntax to use
+    # datadog-query
+    # spl-query
+    # nrql-query
+    # newrelic-query
+    type: "datadog-query"
+    # The query in the appropriate syntax
+    query: "service:rs-cart"
+    # The maximum number of rows to return
+    limit: 100
+timing:
+    # uses Python dateparser, most senible strings will work here
+    start: "1 hour ago"
+    end: "now"

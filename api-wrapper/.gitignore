@@ -1,0 +1,5 @@
+*.swp
+credentials
+token.json
+results.txt
+query.log
