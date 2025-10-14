@@ -160,7 +160,8 @@ def getQueryData():
         'jobGraph': {
             'vertices': [{
                 'name': 'source',
-                'type': 'logs-iceberg-table-source',
+                'type': 'grepr-raw-log-source',
+                'reductionInterval': 'PT2M',
                 'datasetId': datasetId,
                 'start': start,
                 'end': end,
