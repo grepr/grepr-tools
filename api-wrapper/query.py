@@ -126,11 +126,13 @@ def getDatasetID(name):
     return id
 
 def getConfigKey(data, *keys):
-    if data and keys:
-        element = keys[0]
-        if element:
-            value = data.get(element)
-            return value if len(keys) == 1 else getConfigKey(value, *keys[1:])
+    for key in keys:
+        if not isinstance(data, dict):
+            return None
+        data = data.get(key)
+        if data is None:
+            return None
+    return data
     
 
 def getQueryData():
