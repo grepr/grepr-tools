@@ -1,9 +1,12 @@
+import os
 import requests
 import traceback
 import json
 from datetime import datetime, timedelta
 from dotenv import dotenv_values
 
+def opener(path, flags):
+    return os.open(path, flags, 0o600)
 
 def main():
     print('Getting token')
@@ -34,7 +37,7 @@ def main():
     authToken['created'] = '{} {}'.format(now.strftime(fmt), tz)
     expires = now + timedelta(seconds=authToken['expires_in'])
     authToken['expiry'] = '{} {}'.format(expires.strftime(fmt), tz)
-    with open('token.json', 'w') as f:
+    with open('token.json', 'w', opener=opener) as f:
         f.write(json.dumps(authToken, indent=4))
     print('Token saved as token.json')
 
