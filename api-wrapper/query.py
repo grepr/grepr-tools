@@ -17,10 +17,17 @@ authToken = {}
 dataSets = []
 queryConfig = {}
 
+def localLog(msg, printit=False, level=None):
+    if printit:
+        print(msg)
+    
+    if level:
+        logger.log(level, msg)
+
 
 def getAuthToken():
     global authToken
-    logger.info('Loading auth token')
+    localLog('Loading auth token', False, logging.INFO)
     with open('token.json') as f:
         token = json.load(f)
     
@@ -30,13 +37,12 @@ def getAuthToken():
     if now > expiry:
         raise Exception('Token expired. Get a new token')
     
-    print('Loaded authentication token')
+    localLog('Loaded authentication token', True)
     authToken = token
 
 def loadQuery():
     global queryConfig
-    print('Loading Query')
-    logger.info('Loading query')
+    localLog('Loading query', True, logging.INFO)
     with open('query.yaml') as f:
         config = yaml.load(f, yaml.Loader)
     
@@ -52,8 +58,7 @@ def loadQuery():
     if limit == None:
         limit = 100
         config['query']['limit'] = limit
-        logger.info('Limit set to {}'.format(limit))
-        print('Limit set to {}'.format(limit))
+        localLog('Limit set to {}'.format(limit), True, logging.INFO)
     
     # parse the dates
     fmt = '%Y-%m-%dT%H:%M:%SZ'
@@ -82,7 +87,7 @@ def loadQuery():
     #print(config)
 
     queryConfig = config
-    logger.info('Query loaded OK')
+    localLog('Query loaded OK', False, logging.INFO)
 
 def getAPIURL(path):
     base = getConfigKey(queryConfig, 'endpoint')
@@ -93,14 +98,14 @@ def getAPIURL(path):
     if path[0] != '/':
         path = '/' + path
     url = urljoin(base, '/api{}'.format(path))
-    logger.info('API URL {}'.format(url))
+    localLog('API URL {}'.format(url), False, logging.INFO)
     return url
 
 # get all datasets and save the results
 def loadDatasets():
     global dataSets
 
-    logger.info('Loading datasets')
+    localLog('Loading datasets', False, logging.INFO)
     headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer {}'.format(authToken['access_token'])
@@ -112,7 +117,7 @@ def loadDatasets():
     r.raise_for_status()
 
     dataSets = r.json()
-    logger.info('datasets saved {}'.format(len(dataSets)))
+    localLog('datasets saved {}'.format(len(dataSets)), False, logging.INFO)
 
 # look up dataset id by name
 def getDatasetID(name):
@@ -122,7 +127,7 @@ def getDatasetID(name):
             id = d['id']
             break
     
-    logger.info('Data set {} : {}'.format(name, id))
+    localLog('Data set {} : {}'.format(name, id), False, logging.INFO)
     return id
 
 def getConfigKey(data, *keys):
@@ -138,8 +143,7 @@ def getConfigKey(data, *keys):
 def getQueryData():
     query = getConfigKey(queryConfig, 'query', 'query')
     queryType = getConfigKey(queryConfig, 'query', 'type')
-    logger.info('Running query {} {}'.format(queryType, query))
-    print('Running query {} {}'.format(queryType, query))
+    localLog('Running query {} {}'.format(queryType, query), True, logging.INFO)
     dataset = getConfigKey(queryConfig, 'dataset')
     datasetId = getDatasetID(dataset)
     if datasetId == None:
@@ -149,10 +153,8 @@ def getQueryData():
     start = getConfigKey(queryConfig, 'timing', 'start')
     end = getConfigKey(queryConfig, 'timing', 'end')
 
-    print('Start time {}'.format(start))
-    logger.info('Start time {}'.format(start))
-    print('End time {}'.format(end))
-    logger.info('End time {}'.format(end))
+    localLog('Start time {}'.format(start), True, logging.INFO)
+    localLog('End time {}'.format(end), True, logging.INFO)
 
     data = {
         'name': uuid.uuid4().hex,
@@ -183,7 +185,6 @@ def getQueryData():
             ]
         }
     }
-    #print(data)
 
     headers = {
         'Content-Type': 'application/json',
@@ -191,26 +192,26 @@ def getQueryData():
     }
     url = getAPIURL('/v1/jobs/sync')
 
+    count = 0
     with open('results.txt', 'wb') as f:
         with requests.post(url, headers=headers, json=data, stream=True) as r:
-            logger.info('Query status {}'.format(r.status_code))
-            print('Query status {}'.format(r.status_code))
+            localLog('Query status {}'.format(r.status_code), True, logging.INFO)
             r.raise_for_status()
             for line in r.iter_lines():
                 if line:
                     f.write(line)
                     # preserve the new line
                     f.write(b'\n')
+                    count += 1
 
-    print('Query finished. Results saved in results.txt')
-    logger.info('query finished')
+    localLog('Query finished - {} rows. Results saved in results.txt'.format(count), True, logging.INFO)
     return True
 
 def main():
     # set up logging
     fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(filename='query.log', level=logging.INFO, format=fmt)
-    logger.info('Starting')
+    localLog('Starting', False, logging.INFO)
     loadQuery()
     getAuthToken()
     loadDatasets()
@@ -222,6 +223,5 @@ if __name__ == '__main__':
     try:
         main()
     except Exception as e:
-        logger.error(e)
-        print(e)
+        localLog(e, True, logging.ERROR)
         traceback.print_tb(e.__traceback__)
