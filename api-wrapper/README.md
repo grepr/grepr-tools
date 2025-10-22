@@ -2,7 +2,7 @@
 
 [Grepr](http://grepr.ai/) **Intelligent Observability Data Engine** is a proxy for observability agents. It collects the data from agents such as:
 Datadog, Splunk, New Relic and continuously semantically analyses the data stream. It automatically detetcts similarities in the
-data and using machine learns builds and maintains an active set of filters. Frequently occuring data is summarised and forwarded
+data and using machine learning builds and maintains an active set of filters. Frequently occurring data is summarised and forwarded
 to the observability backend while unique data is passed straigh through. This results in a data reduction of 90% with the
 associated platform cost savings.
 
