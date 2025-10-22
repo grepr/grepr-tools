@@ -29,7 +29,7 @@ $ . venv/bin/active
 Install the dependencies
 
 ```bash
-$ pip install -r requirments.txt
+$ pip install -r requirements.txt
 ```
 
 ## Set Up
