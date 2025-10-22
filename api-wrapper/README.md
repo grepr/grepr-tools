@@ -67,4 +67,5 @@ however you wish.
 
 # TODO
 
+* Possibly everything in a Docker container?
 * Add option to backfill the results
