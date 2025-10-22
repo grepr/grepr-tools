@@ -20,7 +20,7 @@ Create a virtual environment for Python. In the directory where you downloaded t
 $ python3 -m venv venv
 ```
 
-Active the virtual environment
+Activate the virtual environment
 
 ```bash
 $ . venv/bin/activate
